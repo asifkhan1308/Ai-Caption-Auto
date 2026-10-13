@@ -1,0 +1,6 @@
+{
+  "name": "AI Auto Captioner",
+  "description": "Generate, edit, and export animated, high-engagement captions for short-form video content with support for multi-lingual speech, Hinglish, auto-emojis, and premium styled presets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
