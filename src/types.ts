@@ -7,6 +7,20 @@ export interface CaptionItem {
 
 export type TextCaseType = "uppercase" | "lowercase" | "capitalize" | "normal";
 
+export type AnimationType =
+  | "pop"
+  | "bounce"
+  | "slide-up"
+  | "slide-down"
+  | "fade-scale"
+  | "pulse-glow"
+  | "kinetic-zoom"
+  | "typewriter"
+  | "blur-reveal"
+  | "whip-pan"
+  | "swing"
+  | "none";
+
 export interface PresetStyle {
   id: string;
   name: string;
@@ -20,17 +34,25 @@ export interface PresetStyle {
   backgroundOpacity: number; // 0 to 1
   textCase: TextCaseType;
   yOffset: number; // 0 to 100 percentage from the top (e.g., 75)
+  xOffset: number; // -40 to 40 percentage horizontal shift from center/anchor
+  rotation: number; // -20 to 20 degrees tilt
+  textOpacity: number; // 0.1 to 1.0 master caption opacity
+  backgroundCornerRadius: number; // 0 to 1.0 factor of fontSize
   shadowColor: string;
   shadowBlur: number;
   letterSpacing: number; // extra pixels
-  shadowOffsetX: number; // in pixels or factor of font size
-  shadowOffsetY: number; // in pixels or factor of font size
+  shadowOffsetX: number; // in pixels
+  shadowOffsetY: number; // in pixels
   isBold: boolean;
   isItalic: boolean;
-  highlightTriggerWords: string; // comma-separated trigger list, e.g. "crazy, 🔥, ⚡"
+  highlightTriggerWords: string; // comma-separated trigger list
   backgroundPaddingX: number; // horizontal padding as factor of font size
   backgroundPaddingY: number; // vertical padding as factor of font size
   textAlignment: "left" | "center" | "right";
+  // Transition and text animations
+  animationType: AnimationType;
+  animationDuration: number; // in seconds (e.g., 0.18s to 0.40s)
+  exitTransition: boolean; // whether to smoothly shrink/fade before end
 }
 
 export interface VideoMetadata {

@@ -39,7 +39,7 @@ function getGeminiClient(): GoogleGenAI {
 // API Route for Audio Transcription using Gemini 3.5 Flash
 app.post("/api/transcribe", async (req, res) => {
   try {
-    const { audio, mimeType, promptContext } = req.body;
+    const { audio, mimeType, promptContext, targetLanguage } = req.body;
 
     if (!audio) {
       return res.status(400).json({ error: "No audio data provided." });
@@ -60,34 +60,56 @@ app.post("/api/transcribe", async (req, res) => {
       },
     };
 
+    const isTranslation =
+      targetLanguage &&
+      targetLanguage !== "original" &&
+      targetLanguage !== "Original Spoken Language";
+
+    const languageDirective = isTranslation
+      ? `
+*** AUDIO TRANSLATION REQUIRED ***
+TARGET LANGUAGE: "${targetLanguage}"
+You MUST translate all spoken speech in the audio into ${targetLanguage}.
+- Every word or phrase in the resulting "text" attribute MUST be translated into ${targetLanguage}.
+- Do NOT output the source language text; output only the translated text in ${targetLanguage}.
+- Keep the translation conversational, punchy, and suited for high-retention short-form video captions (Reels/TikTok/Shorts).
+- Ensure the start and end timestamps correspond accurately to the audio duration when the original thought was spoken.
+`
+      : `
+*** ORIGINAL AUDIO TRANSCRIPTION ***
+- Transcribe the spoken text in the exact language spoken.
+- Multilingual audio (e.g. English, Hindi, Hinglish, Spanish) should be accurately transcribed as spoken.
+`;
+
     const promptText = `
-You are an advanced, high-precision audio transcription model specializing in auto-caption generation for social media (Shorts, Reels, TikToks).
-Transcribe the provided audio into highly accurate word-level or short phrase-level timestamps.
+You are an advanced, high-precision audio transcription and translation model specializing in auto-caption generation for social media (Shorts, Reels, TikToks).
+Transcribe ${isTranslation ? `and TRANSLATE the provided audio into ${targetLanguage}` : "the provided audio"} into highly accurate word-level or short phrase-level timestamps.
+
+${languageDirective}
 
 Guidelines:
-1. Transcribe the spoken text exactly as heard.
-2. Support multilingual speech, specifically English, Hindi, and Hinglish (mixed English and Hindi written in the Latin alphabet).
-3. Insert relevant, expressive emojis naturally at key emphatic words to increase visual engagement (e.g., "editing is crazy! 🔥").
-4. Split the transcription into single words or very short phrases (1-2 words per element max) to create dynamic, punchy subtitle timings (suitable for fast-paced vertical video editing).
+1. ${
+      isTranslation
+        ? `TRANSLATION: Translate the speech into ${targetLanguage}. The transcribed 'text' values MUST be in ${targetLanguage}.`
+        : `Transcribe the spoken text exactly as heard in its original spoken language.`
+    }
+2. Support multilingual nuances, slang, and cultural context naturally while preserving emotional tone and energy.
+3. Do NOT insert emojis unless the user explicitly asks for emojis in the additional user request details. Keep the caption text clean and professional.
+4. Split the subtitles into single words or very short phrases (1-2 words per element max, occasionally 3 words if needed for natural grammar in ${isTranslation ? targetLanguage : "the spoken language"}) to create dynamic, punchy subtitle timings (suitable for fast-paced vertical video editing).
 5. For each element, specify precise 'start' and 'end' timestamps in seconds (as floats, e.g., 1.45).
-6. Ensure that the 'start' and 'end' timings represent when each word is spoken.
+6. Ensure that the 'start' and 'end' timings represent when each word/phrase is articulated in the audio stream.
 
 You MUST return a JSON array of caption objects matching this schema:
 [
   {
-    "text": "bhai",
+    "text": "${isTranslation ? "hola" : "welcome"}",
     "start": 0.0,
     "end": 0.45
   },
   {
-    "text": "this",
+    "text": "${isTranslation ? "increíble" : "editing"}",
     "start": 0.45,
-    "end": 0.72
-  },
-  {
-    "text": "editing 🔥",
-    "start": 0.72,
-    "end": 1.15
+    "end": 0.95
   }
 ]
 
@@ -95,15 +117,19 @@ Additional user request details: ${promptContext || "No additional context."}
 `;
 
     // High resiliency: retry transient Gemini API errors (e.g., 503 high demand or 429 rate limit)
+    // Also alternates between gemini-3.5-flash and gemini-3.8-flash on temporary demand spikes
+    const candidateModels = ["gemini-3.5-flash", "gemini-3.8-flash"];
     let response;
     let attempt = 0;
     const maxRetries = 3;
-    const baseDelayMs = 2000;
+    const baseDelayMs = 1500;
 
     while (true) {
+      attempt++;
+      const currentModel = candidateModels[(attempt - 1) % candidateModels.length];
       try {
         response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
+          model: currentModel,
           contents: [
             audioPart,
             { text: promptText }
@@ -117,7 +143,7 @@ Additional user request details: ${promptContext || "No additional context."}
                 properties: {
                   text: {
                     type: Type.STRING,
-                    description: "The word or short 1-2 word phrase transcribed, optionally with an emoji.",
+                    description: "The word or short 1-2 word phrase transcribed.",
                   },
                   start: {
                     type: Type.NUMBER,
@@ -136,7 +162,6 @@ Additional user request details: ${promptContext || "No additional context."}
         });
         break; // Success, break retry loop!
       } catch (err: any) {
-        attempt++;
         const errMsg = String(err.message || err);
         const isTransient = 
           err.status === "UNAVAILABLE" || 
@@ -151,7 +176,7 @@ Additional user request details: ${promptContext || "No additional context."}
 
         if (isTransient && attempt < maxRetries) {
           const delay = baseDelayMs * Math.pow(2, attempt - 1);
-          console.warn(`Gemini API returned transient error (attempt ${attempt}/${maxRetries}): ${errMsg}. Retrying in ${delay}ms...`);
+          console.warn(`Gemini API error on ${currentModel} (attempt ${attempt}/${maxRetries}): ${errMsg}. Retrying with next model in ${delay}ms...`);
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue;
         }

@@ -73,7 +73,7 @@ export function bufferToWav(buffer: AudioBuffer): ArrayBuffer {
  * Extracts and downsamples the audio from a video/audio File to a 16kHz Mono WAV base64 string
  */
 export async function extractWavAudio(
-  file: File,
+  file: Blob | File,
   onProgress?: (stage: string, progress: number) => void
 ): Promise<{ base64: string; duration: number }> {
   onProgress?.("Reading file data...", 10);

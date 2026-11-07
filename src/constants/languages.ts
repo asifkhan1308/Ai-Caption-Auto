@@ -1,0 +1,171 @@
+export interface TargetLanguage {
+  code: string;
+  name: string;
+  nativeName?: string;
+  regionCode: string;
+  description: string;
+}
+
+export const TARGET_LANGUAGES: TargetLanguage[] = [
+  {
+    code: "original",
+    name: "Original Spoken Language",
+    nativeName: "Original Audio",
+    regionCode: "AUTO",
+    description: "Keep original speech without translation (multilingual detection)",
+  },
+  {
+    code: "English",
+    name: "English",
+    nativeName: "English",
+    regionCode: "EN",
+    description: "Translate speech into English with natural pacing",
+  },
+  {
+    code: "Spanish",
+    name: "Spanish",
+    nativeName: "Español",
+    regionCode: "ES",
+    description: "Translate into fluent conversational Spanish",
+  },
+  {
+    code: "Hindi",
+    name: "Hindi",
+    nativeName: "हिन्दी",
+    regionCode: "HI",
+    description: "Translate into Devanagari Hindi text",
+  },
+  {
+    code: "Hinglish",
+    name: "Hinglish",
+    nativeName: "Hinglish (Latin)",
+    regionCode: "HI-LATN",
+    description: "Translate and render Hindi in Latin alphabet for short-form video",
+  },
+  {
+    code: "French",
+    name: "French",
+    nativeName: "Français",
+    regionCode: "FR",
+    description: "Translate into contemporary conversational French",
+  },
+  {
+    code: "German",
+    name: "German",
+    nativeName: "Deutsch",
+    regionCode: "DE",
+    description: "Translate into modern German subtitles",
+  },
+  {
+    code: "Portuguese",
+    name: "Portuguese",
+    nativeName: "Português",
+    regionCode: "PT",
+    description: "Translate into Brazilian / European Portuguese",
+  },
+  {
+    code: "Italian",
+    name: "Italian",
+    nativeName: "Italiano",
+    regionCode: "IT",
+    description: "Translate into conversational Italian",
+  },
+  {
+    code: "Japanese",
+    name: "Japanese",
+    nativeName: "日本語",
+    regionCode: "JA",
+    description: "Translate into natural Japanese short-form subtitles",
+  },
+  {
+    code: "Chinese (Simplified)",
+    name: "Chinese (Simplified)",
+    nativeName: "简体中文",
+    regionCode: "ZH",
+    description: "Translate into Simplified Chinese characters",
+  },
+  {
+    code: "Korean",
+    name: "Korean",
+    nativeName: "한국어",
+    regionCode: "KO",
+    description: "Translate into modern Korean subtitles",
+  },
+  {
+    code: "Arabic",
+    name: "Arabic",
+    nativeName: "العربية",
+    regionCode: "AR",
+    description: "Translate into Modern Standard Arabic",
+  },
+  {
+    code: "Russian",
+    name: "Russian",
+    nativeName: "Русский",
+    regionCode: "RU",
+    description: "Translate into Russian subtitles",
+  },
+  {
+    code: "Indonesian",
+    name: "Indonesian",
+    nativeName: "Bahasa Indonesia",
+    regionCode: "ID",
+    description: "Translate into dynamic Indonesian phrases",
+  },
+  {
+    code: "Turkish",
+    name: "Turkish",
+    nativeName: "Türkçe",
+    regionCode: "TR",
+    description: "Translate into colloquial Turkish subtitles",
+  },
+  {
+    code: "Dutch",
+    name: "Dutch",
+    nativeName: "Nederlands",
+    regionCode: "NL",
+    description: "Translate into natural Dutch",
+  },
+  {
+    code: "Vietnamese",
+    name: "Vietnamese",
+    nativeName: "Tiếng Việt",
+    regionCode: "VI",
+    description: "Translate into contemporary Vietnamese",
+  },
+  {
+    code: "Urdu",
+    name: "Urdu",
+    nativeName: "اردو",
+    regionCode: "UR",
+    description: "Translate into Urdu subtitles",
+  },
+  {
+    code: "Bengali",
+    name: "Bengali",
+    nativeName: "বাংলা",
+    regionCode: "BN",
+    description: "Translate into Bengali subtitles",
+  },
+  {
+    code: "Filipino (Tagalog)",
+    name: "Filipino / Tagalog",
+    nativeName: "Tagalog",
+    regionCode: "TL",
+    description: "Translate into Tagalog / Taglish for social clips",
+  },
+  {
+    code: "Polish",
+    name: "Polish",
+    nativeName: "Polski",
+    regionCode: "PL",
+    description: "Translate into natural Polish subtitles",
+  },
+  {
+    code: "Thai",
+    name: "Thai",
+    nativeName: "ไทย",
+    regionCode: "TH",
+    description: "Translate into modern Thai subtitles",
+  },
+];
